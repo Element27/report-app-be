@@ -10,7 +10,7 @@ const User = require('../model/userModel');
 
 const getAllUsers = asyncHandler(async (req, res) => {
 
-  const data = await User.find({});
+  const data = await User.find({ company_id: req.user.company_id });
 
   // remove password from the data returned using map
   const refinedData = data.map((user) => {
@@ -19,6 +19,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      company_id: user.company_id,
       isActive: user.isActive,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
@@ -82,6 +83,7 @@ const addUser = asyncHandler(async (req, res) => {
     role,
     password: hashedPassword,
     isActive: true,
+    company_id: req.user.company_id
   })
 
   // TODO send the registration details to the newly added user.
@@ -113,6 +115,7 @@ const getUser = asyncHandler(async (req, res) => {
     name: data.name,
     email: data.email,
     role: data.role,
+    company_id: data.company_id,
     createdAt: data.createdAt,
     updatedAt: data.updatedAt,
     isActive: data.isActive

@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 
 
 const User = require('../model/userModel');
+const Company = require('../model/companyModel');
 const generateToken = require('../utils/generateToken');
 
 
@@ -18,11 +19,15 @@ const register = asyncHandler(async (req, res) => {
     throw new Error('Invalid request')
   }
 
-  const { name, email, password } = req.body;
+  const { name, email, password, company_name, company_email, description } = req.body;
 
   if (!name) {
     res.status(400);
     throw new Error('name is required');
+  }
+  if (!company_name) {
+    res.status(400);
+    throw new Error('company name is required');
   }
 
   if (!email) {
@@ -52,27 +57,53 @@ const register = asyncHandler(async (req, res) => {
     isActive: true
   })
 
-  // token generation
-  if (newUser) {
+  const newCompany = await Company.create({
+    name: company_name,
+    email: company_email,
+    description: description,
+    user_id: newUser._id
+  })
 
-    const accessToken = generateToken({
-      email: newUser.email, id: newUser._id,
-      role: newUser.role
-    });
-    res.status(201).json({
-      message: "successful",
-      data: {
-        _id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
-      },
-      accessToken
-    })
-  } else {
-    res.status(401);
+  if (!newUser || !newCompany) {
+
+    if (newUser) {
+      await User.deleteOne({ _id: newUser._id });
+    }
+
+    if (newCompany) {
+      await Company.deleteOne({ _id: newCompany._id });
+    }
+
+    res.status(400);
     throw new Error("registration failed");
   }
+
+  const updateNewUser = await User.findByIdAndUpdate(newUser._id, {
+    $set: {
+      company_id: newCompany._id
+    }
+  })
+
+  // token generation
+  const accessToken = generateToken({
+    email: newUser.email,
+    id: newUser._id,
+    role: newUser.role,
+    company_id: newCompany._id
+  });
+
+  res.status(201).json({
+    message: "successful",
+    data: {
+      _id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+      company_id: newUser.company_id
+    },
+    accessToken
+  })
+
   // res.json({ message: "created successfully", data: newUser });
 })
 
@@ -101,7 +132,8 @@ const login = asyncHandler(async (req, res) => {
     const details = {
       email: user.email,
       id: user._id,
-      role: user.role
+      role: user.role,
+      company_id: user.company_id
     }
 
     const accessToken = generateToken(details);

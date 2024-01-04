@@ -9,9 +9,10 @@ const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
 app.use('/api/auth', require('./routes/authRoute'));
-app.use('/api/transactions', require('./routes/transactionsRoute'));
 app.use('/api/users', require('./routes/usersRoute'));
+app.use('/api/company', require('./routes/companyRoute'));
 app.use('/api/accounts', require('./routes/accountRouter'));
+app.use('/api/transactions', require('./routes/transactionsRoute'));
 app.use(errorHandler);
 
 

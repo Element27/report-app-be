@@ -9,6 +9,6 @@ router.use(validateToken);
 router.get('/', getAllAccount);
 router.get('/open', openAccount);
 router.get('/current', currentAccount);
-router.get('/close', closeAccount);
+router.put('/close', closeAccount);
 
 module.exports = router;

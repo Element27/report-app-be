@@ -1,4 +1,5 @@
 // @routes to manage transactions in the system
+const validateToken = require('../middleware/authMiddleware');
 const express = require('express');
 
 const {
@@ -13,7 +14,7 @@ const {
 
 const router = express.Router();
 
-// TODO:add middlewares for authentication and checking user role
+router.use(validateToken);
 
 router.get('/', getTransactions);
 

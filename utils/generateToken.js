@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
 // TODO add company detials and user name
 const generateToken = (details) => {
-  // user data should contain email, id, role, company id, company name, user name
+  // user data should contain email, id, role, company id
 
   // generate access token and refresh token
   const accessToken = jwt.sign({ details }, process.env.ACCESS_TOKEN_SECRET,
